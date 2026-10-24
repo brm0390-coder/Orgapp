@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Putzplan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#eef5f3;--card:#fff;--ink:#14302c;--mute:#6b8580;--line:#d8e6e2;--accent:#0f766e;--ok:#3fb68b;--mid:#f2b630;--bad:#e4572e;--shadow:0 1px 2px rgba(20,48,44,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1d1b;--card:#152926;--card:#152926;--ink:#e3f1ee;--mute:#8fb0aa;--line:#24403c;--accent:#4fd1c0;--shadow:none}}
+:root[data-theme="dark"]{--bg:#0d1d1b;--card:#152926;--ink:#e3f1ee;--mute:#8fb0aa;--line:#24403c;--accent:#4fd1c0;--shadow:none}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+body{max-width:560px;margin:0 auto;padding:16px 16px 96px}
+h1{font-size:28px;font-weight:800;margin:8px 0 2px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 18px;font-size:15px}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:12px;padding:14px;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;cursor:pointer}
+.list{display:flex;flex-direction:column;gap:10px}
+.ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:var(--bg);flex:none}
+.grow{flex:1;min-width:0}
+.t{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m{color:var(--mute);font-size:13px;margin-top:2px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.done{width:42px;height:42px;border-radius:50%;border:2px solid var(--accent);background:none;color:var(--accent);font-size:20px;cursor:pointer;flex:none;transition:transform .15s,background .15s}
+.done:active{transform:scale(.88);background:var(--accent);color:var(--bg)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{display:flex;width:100%;max-width:560px}
+nav button{flex:1;padding:12px 4px 14px;background:none;border:0;color:var(--mute);font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+nav button[aria-current="true"]{color:var(--accent)}
+nav button span{display:block;font-size:20px}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.back{background:none;border:0;color:var(--accent);font:inherit;font-weight:700;font-size:16px;cursor:pointer;padding:6px 0}
+.btn{background:var(--accent);color:var(--bg);border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn.ghost{background:none;color:var(--accent);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--bad);border:1px solid var(--line)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+form{display:flex;flex-direction:column;gap:10px;padding:14px}
+input,select{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.empty{padding:28px 16px;text-align:center;color:var(--mute)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{padding:16px}
+.stat b{display:block;font-size:30px;font-weight:800}
+.hint{font-size:13px;color:var(--mute);margin:14px 0 6px;font-weight:700}
+.ring{width:64px;height:64px;flex:none}
+.pill{font-size:12px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--bg);color:var(--mute)}
+.tiles{display:flex;flex-direction:column;gap:12px}.tile{display:flex;align-items:center;gap:16px;padding:20px;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}.tile .ti{width:60px;height:60px;border-radius:16px;background:var(--bg);display:grid;place-items:center;font-size:30px;flex:none}.tile .tx{flex:1;display:flex;flex-direction:column}.tile .tx b{font-size:19px}.tile .tx small{color:var(--mute);font-size:14px;margin-top:2px}.tile>.m{font-size:26px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:6px}.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav><div>
+<button data-tab="home"><span>☰</span>Menü</button>
+<button data-tab="today"><span>✓</span>Heute</button>
+<button data-tab="rooms"><span>⌂</span>Räume</button>
+<button data-tab="stats"><span>▥</span>Statistik</button>
+</div></nav>
+<script>
+var DAY=86400000, KEY="putzplan-v1";
+function ago(d){return Date.now()-d*DAY}
+function seed(){return {rooms:[
+{id:1,name:"Küche",icon:"🍳",tasks:[
+{id:11,name:"Arbeitsflächen wischen",every:2,last:ago(3)},
+{id:12,name:"Herd reinigen",every:7,last:ago(5)},
+{id:13,name:"Kühlschrank auswischen",every:30,last:ago(12)},
+{id:14,name:"Boden wischen",every:7,last:ago(9)}]},
+{id:2,name:"Bad",icon:"🛁",tasks:[
+{id:21,name:"Waschbecken putzen",every:4,last:ago(2)},
+{id:22,name:"Toilette reinigen",every:5,last:ago(6)},
+{id:23,name:"Dusche entkalken",every:14,last:ago(4)}]},
+{id:3,name:"Wohnzimmer",icon:"🛋️",tasks:[
+{id:31,name:"Staubsaugen",every:7,last:ago(3)},
+{id:32,name:"Staub wischen",every:10,last:ago(11)}]},
+{id:4,name:"Schlafzimmer",icon:"🛏️",tasks:[
+{id:41,name:"Bettwäsche wechseln",every:14,last:ago(10)},
+{id:42,name:"Staubsaugen",every:14,last:ago(2)}]}],log:[],tab:"today",room:null,add:null};}
+var S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
+if(!S||!S.rooms)S=seed();
+S.tab="home";S.room=null;S.add=null;S.todos=S.todos||[];S.shop=S.shop||[];
+var PRE={
+"Küche":{icon:"🍳",t:[["Arbeitsflächen wischen",2],["Spüle reinigen",3],["Mülleimer leeren",3],["Herd reinigen",7],["Boden wischen",7],["Geschirrtücher wechseln",7],["Kühlschrank auswischen",30],["Backofen reinigen",60]]},
+"Bad":{icon:"🛁",t:[["Waschbecken putzen",4],["Toilette reinigen",5],["Handtücher wechseln",5],["Dusche oder Wanne putzen",7],["Boden wischen",7],["Spiegel putzen",14],["Dusche entkalken",14],["Abfluss reinigen",30]]},
+"Wohnzimmer":{icon:"🛋️",t:[["Staubsaugen",7],["Staub wischen",10],["Sofa absaugen",14],["Fenster putzen",60],["Pflanzen gießen",5]]},
+"Schlafzimmer":{icon:"🛏️",t:[["Bett machen und lüften",1],["Bettwäsche wechseln",14],["Staubsaugen",14],["Staub wischen",14],["Matratze wenden",90],["Fenster putzen",60]]},
+"Flur":{icon:"🚪",t:[["Boden saugen oder wischen",7],["Schuhe aufräumen",7],["Fußmatte ausklopfen",14],["Spiegel und Garderobe abwischen",30]]},
+"Arbeitszimmer":{icon:"💻",t:[["Schreibtisch aufräumen",3],["Staub wischen",10],["Staubsaugen",14],["Bildschirm und Tastatur reinigen",30]]},
+"Kinderzimmer":{icon:"🧸",t:[["Spielsachen aufräumen",2],["Staubsaugen",7],["Bettwäsche wechseln",14],["Spielzeug reinigen",30],["Kleiderschrank sortieren",90]]},
+"Balkon":{icon:"🪴",t:[["Boden fegen",14],["Pflanzen gießen",3],["Möbel abwischen",30],["Fenster und Geländer putzen",60]]}
+};
+function mk(x,i){return {id:Date.now()+i,name:x[0],every:x[1],last:Date.now()-0.7*x[1]*DAY}}
+function typeOf(r){if(r.type&&PRE[r.type])return r.type;return Object.keys(PRE).filter(function(k){return r.name.indexOf(k)>-1})[0]||""}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function ratio(t){return (Date.now()-t.last)/(t.every*DAY)}
+function col(r){return r>=1?"var(--bad)":r>=.6?"var(--mid)":"var(--ok)"}
+function pct(r){return Math.max(6,Math.min(100,Math.round(r*100)))}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function due(t){
+ var d=Math.ceil(t.every-(Date.now()-t.last)/DAY);
+ if(d<0)return (-d)+(d===-1?" Tag":" Tage")+" überfällig";
+ if(d===0)return "heute fällig";
+ if(d===1)return "morgen fällig";
+ return "in "+d+" Tagen";
+}
+function roomScore(r){
+ if(!r.tasks.length)return 0;
+ var m=0;r.tasks.forEach(function(t){m=Math.max(m,ratio(t))});
+ var avg=r.tasks.reduce(function(a,t){return a+Math.min(1.2,ratio(t))},0)/r.tasks.length;
+ return (m+avg)/2;
+}
+function allTasks(){var a=[];S.rooms.forEach(function(r){r.tasks.forEach(function(t){a.push({r:r,t:t})})});return a}
+function markDone(rid,tid){
+ S.rooms.forEach(function(r){if(r.id===rid)r.tasks.forEach(function(t){if(t.id===tid){t.last=Date.now();S.log.push({t:Date.now(),task:t.name,room:r.name})}})});
+ if(S.log.length>500)S.log=S.log.slice(-500);
+ save();render();
+}
+function taskRow(r,t,showRoom){
+ var q=ratio(t);
+ return '<div class="card"><div class="row" style="cursor:default"><div class="grow"><div class="t">'+esc(t.name)+'</div>'
+ +'<div class="m">'+(showRoom?esc(r.icon+" "+r.name)+" · ":"")+due(t)+'</div>'
+ +'<div class="bar"><i style="width:'+pct(q)+'%;background:'+col(q)+'"></i></div></div>'
+ +'<button class="done" aria-label="'+esc(t.name)+' erledigt" data-done="'+r.id+','+t.id+'">✓</button>'
+ +(showRoom?'':'<button class="done" style="border-color:var(--line);color:var(--mute)" aria-label="Aufgabe löschen" data-deltask="'+r.id+','+t.id+'">×</button>')+'</div></div>';
+}
+function viewToday(){
+ var a=allTasks().sort(function(x,y){return ratio(y.t)-ratio(x.t)});
+ var late=a.filter(function(x){return ratio(x.t)>=1}).length;
+ var h='<h1>Heute</h1><p class="sub">'+(late?late+(late===1?" Aufgabe wartet":" Aufgaben warten"):"Alles im grünen Bereich")+'</p>';
+ if(!a.length)return h+'<div class="card empty">Lege zuerst einen Raum mit Aufgaben an.</div>';
+ var soon=a.filter(function(x){return ratio(x.t)>=.6});
+ if(!soon.length)h+='<div class="card empty">Nichts dringend. Schau später wieder vorbei.</div>';
+ h+='<div class="list">'+soon.map(function(x){return taskRow(x.r,x.t,true)}).join("")+'</div>';
+ var rest=a.filter(function(x){return ratio(x.t)<.6});
+ if(rest.length)h+='<div class="hint">Noch nicht dran</div><div class="list">'+rest.map(function(x){return taskRow(x.r,x.t,true)}).join("")+'</div>';
+ return h;
+}
+function viewRooms(){
+ var h='<h1>Räume</h1><p class="sub">Je voller der Balken, desto dringender.</p><div class="list">';
+ S.rooms.forEach(function(r){
+  var q=roomScore(r);
+  h+='<div class="card"><button class="row" data-room="'+r.id+'"><div class="ico">'+r.icon+'</div><div class="grow"><div class="t">'+esc(r.name)+'</div><div class="m">'+r.tasks.length+(r.tasks.length===1?" Aufgabe":" Aufgaben")+'</div><div class="bar"><i style="width:'+pct(q)+'%;background:'+col(q)+'"></i></div></div></button></div>';
+ });
+ h+='</div>';
+ if(S.add==="room"){
+  h+='<div class="card" style="margin-top:12px"><form id="fRoom"><select name="type" aria-label="Vorlage"><option value="">Ohne Vorlage (leer)</option>'+Object.keys(PRE).map(function(k){return '<option>'+k+'</option>'}).join("")+'</select><input name="icon" placeholder="Symbol (optional)" maxlength="4" aria-label="Symbol"><input name="name" placeholder="Name (bei Vorlage optional)" aria-label="Name"><button class="btn">Raum speichern</button><button type="button" class="btn ghost" data-cancel>Abbrechen</button></form></div>';
+ }else h+='<p><button class="btn" data-addroom style="width:100%;margin-top:12px">Raum hinzufügen</button></p>';
+ return h;
+}
+function viewRoom(){
+ var r=S.rooms.filter(function(x){return x.id===S.room})[0];
+ if(!r){S.room=null;return viewRooms()}
+ var h='<div class="top"><button class="back" data-back>‹ Räume</button></div><h1>'+esc(r.icon+" "+r.name)+'</h1><p class="sub">'+r.tasks.length+' Aufgaben</p><div class="list">';
+ r.tasks.slice().sort(function(a,b){return ratio(b)-ratio(a)}).forEach(function(t){
+  h+=taskRow(r,t,false).replace('<button class="done"','<button class="done"')+'';
+ });
+ h+='</div>';
+ if(!r.tasks.length)h+='<div class="card empty">Noch keine Aufgaben in diesem Raum.</div>';
+ if(S.add==="task"){
+  h+='<div class="card" style="margin-top:12px"><form id="fTask"><input name="name" placeholder="Aufgabe, z. B. Fenster putzen" required aria-label="Aufgabe"><select name="every" aria-label="Wie oft"><option value="1">Jeden Tag</option><option value="3">Alle 3 Tage</option><option value="7" selected>Jede Woche</option><option value="14">Alle 2 Wochen</option><option value="30">Jeden Monat</option><option value="90">Alle 3 Monate</option></select><button class="btn">Aufgabe speichern</button><button type="button" class="btn ghost" data-cancel>Abbrechen</button></form></div>';
+ }else h+='<p><button class="btn" data-addtask style="width:100%;margin-top:12px">Aufgabe hinzufügen</button></p>';
+ var ty=typeOf(r),have=r.tasks.map(function(t){return t.name}),sug=ty?PRE[ty].t.filter(function(x){return have.indexOf(x[0])<0}):[];
+ if(sug.length){h+='<div class="hint">Vorschläge für '+esc(ty)+'</div><div class="list">'+sug.map(function(x){return '<div class="card"><button class="row" data-pn="'+esc(x[0])+'" data-pe="'+x[1]+'"><div class="grow"><div class="t">'+esc(x[0])+'</div><div class="m">'+(x[1]===1?'jeden Tag':x[1]===7?'jede Woche':'alle '+x[1]+' Tage')+'</div></div><span class="pill">+ Hinzufügen</span></button></div>'}).join('')+'</div>'}
+ h+='<p><button class="btn danger" data-delroom="'+r.id+'" style="width:100%;margin-top:14px">Raum löschen</button></p>';
+ return h;
+}
+function viewStats(){
+ var now=Date.now(),w=S.log.filter(function(l){return now-l.t<7*DAY}).length;
+ var m=S.log.filter(function(l){return now-l.t<30*DAY}).length;
+ var cnt={};S.log.forEach(function(l){cnt[l.room]=(cnt[l.room]||0)+1});
+ var keys=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
+ var max=keys.length?cnt[keys[0]]:1;
+ var h='<h1>Statistik</h1><p class="sub">Was du schon geschafft hast.</p><div class="stats"><div class="card stat"><b>'+w+'</b>erledigt in 7 Tagen</div><div class="card stat"><b>'+m+'</b>erledigt in 30 Tagen</div></div>';
+ if(!keys.length)return h+'<div class="card empty">Hake eine Aufgabe ab, dann erscheint hier deine Auswertung.</div>';
+ h+='<div class="hint">Erledigt pro Raum</div><div class="card" style="padding:14px">';
+ keys.forEach(function(k){h+='<div style="margin-bottom:12px"><div class="m" style="display:flex;justify-content:space-between;margin:0"><span>'+esc(k)+'</span><b>'+cnt[k]+'</b></div><div class="bar"><i style="width:'+Math.round(cnt[k]/max*100)+'%;background:var(--accent)"></i></div></div>'});
+ h+='</div><div class="hint">Zuletzt erledigt</div><div class="list">';
+ S.log.slice(-5).reverse().forEach(function(l){h+='<div class="card row" style="cursor:default"><div class="grow"><div class="t">'+esc(l.task)+'</div><div class="m">'+esc(l.room)+' · '+new Date(l.t).toLocaleDateString("de-DE",{day:"numeric",month:"short"})+'</div></div></div>'});
+ return h+'</div>';
+}
+var CAT=[["Obst & Gemüse","🥬",["apfel","äpfel","banane","tomate","gurke","salat","kartoffel","zwiebel","karotte","möhre","paprika","zitrone","orange","birne","trauben","beeren","gemüse","obst","knoblauch","pilz","brokkoli","avocado"]],["Milch & Eier","🥛",["milch","butter","käse","joghurt","quark","sahne","eier","skyr"]],["Brot & Backwaren","🍞",["brot","brötchen","toast","mehl","hefe","kuchen"]],["Fleisch & Fisch","🥩",["fleisch","hack","hähnchen","wurst","schinken","lachs","fisch","salami","speck"]],["Vorrat","🍝",["nudel","reis","müsli","haferflocken","zucker","salz","öl","essig","soße","sauce","dose","bohnen","linsen","kaffee","tee","nutella","marmelade","honig","chips","schokolade","kekse"]],["Getränke","🥤",["wasser","saft","cola","bier","wein","limo","sprudel"]],["Haushalt & Drogerie","🧴",["toilettenpapier","klopapier","spülmittel","waschmittel","seife","shampoo","zahnpasta","küchenrolle","müllbeutel","müllsäcke","schwamm","tabs","deo","taschentücher"]]];
+var QUICK=["Milch","Brot","Eier","Butter","Bananen","Äpfel","Tomaten","Nudeln","Reis","Kaffee","Toilettenpapier","Spülmittel"];
+function catOf(n){var l=n.toLowerCase();for(var i=0;i<CAT.length;i++)for(var j=0;j<CAT[i][2].length;j++)if(l.indexOf(CAT[i][2][j])>-1)return i;return CAT.length}
+function cname(i){return i<CAT.length?CAT[i][0]:"Sonstiges"}
+function cico(i){return i<CAT.length?CAT[i][1]:"📦"}
+function addShop(t){
+ t=t.trim();if(!t)return;
+ var m=t.match(/^(\d+[.,]?\d*\s?(?:x|kg|g|l|ml|stk|pck|pkt)?)\s+(.+)$/i),q="",n=t;
+ if(m){q=m[1].trim();n=m[2].trim()}
+ n=n.charAt(0).toUpperCase()+n.slice(1);
+ if(S.shop.some(function(x){return !x.done&&x.name.toLowerCase()===n.toLowerCase()}))return;
+ S.shop.unshift({id:Date.now()*1000+Math.floor(Math.random()*1000),name:n,qty:q,cat:catOf(n),done:false});
+}
+function tile(tab,ic,ti,su){return '<button class="tile card" data-tab="'+tab+'"><span class="ti">'+ic+'</span><span class="tx"><b>'+ti+'</b><small>'+su+'</small></span><span class="m">›</span></button>'}
+function viewHome(){
+ var td=S.todos.filter(function(x){return !x.done}).length,sh=S.shop.filter(function(x){return !x.done}).length;
+ var late=allTasks().filter(function(x){return ratio(x.t)>=1}).length;
+ return '<h1>Zuhause</h1><p class="sub">Was möchtest du erledigen?</p><div class="tiles">'
+ +tile("todo","✅","To-do",td?td+" offen":"Alles erledigt")
+ +tile("shop","🛒","Einkaufsliste",sh?sh+(sh===1?" Artikel":" Artikel"):"Liste leer")
+ +tile("today","🧽","Haushaltsplan",late?late+(late===1?" überfällig":" überfällig"):"Alles sauber")+'</div>';
+}
+function viewShop(){
+ var open=S.shop.filter(function(x){return !x.done}),dn=S.shop.filter(function(x){return x.done});
+ var names=open.map(function(x){return x.name.toLowerCase()});
+ var h='<div class="top"><button class="back" data-tab="home">‹ Menü</button></div><h1>Einkaufsliste</h1><p class="sub">'+(open.length?open.length+' Artikel':'Nichts zu besorgen')+'</p>';
+ h+='<div class="card" style="margin-bottom:10px"><form id="fShop" style="flex-direction:row"><input id="shopIn" name="text" placeholder="Artikel, z. B. 2 Milch" aria-label="Neuer Artikel" required autocomplete="off"><button class="btn" aria-label="Hinzufügen">+</button></form></div>';
+ var qs=QUICK.filter(function(n){return names.indexOf(n.toLowerCase())<0});
+ if(qs.length)h+='<div class="chips">'+qs.map(function(n){return '<button class="chip" data-q="'+n+'">+ '+n+'</button>'}).join('')+'</div>';
+ if(!S.shop.length)return h+'<div class="card empty">Die Liste ist leer. Tippe einen Artikel ein oder wähle einen Vorschlag.</div>';
+ function row(x){
+  var st=x.done?'background:var(--accent);color:var(--bg);':'',sz='width:36px;height:36px;font-size:17px;';
+  return '<div class="card"><div class="row" style="cursor:default;padding:10px 14px"><button class="done" style="'+st+sz+'" aria-label="'+esc(x.name)+(x.done?' wieder auf die Liste':' im Wagen')+'" data-sdone="'+x.id+'">✓</button><div class="grow"><div class="t" style="white-space:normal;'+(x.done?'text-decoration:line-through;color:var(--mute)':'')+'">'+esc(x.name)+(x.qty?' <span class="pill">'+esc(x.qty)+'</span>':'')+'</div></div><button class="done" style="border-color:var(--line);color:var(--mute);'+sz+'" aria-label="Löschen" data-sdel="'+x.id+'">×</button></div></div>';
+ }
+ for(var i=0;i<=CAT.length;i++){var g=open.filter(function(x){return x.cat===i});if(g.length)h+='<div class="hint">'+cico(i)+' '+cname(i)+'</div><div class="list">'+g.map(row).join('')+'</div>'}
+ if(dn.length)h+='<div class="hint">Im Wagen ('+dn.length+')</div><div class="list">'+dn.map(row).join('')+'</div><p><button class="btn ghost" data-sclear style="width:100%;margin-top:12px">Erledigte entfernen</button></p>';
+ return h;
+}
+function viewTodo(){
+ var open=S.todos.filter(function(x){return !x.done}),dn=S.todos.filter(function(x){return x.done});
+ var h='<div class="top"><button class="back" data-tab="home">‹ Menü</button></div><h1>To-do</h1><p class="sub">'+(open.length?open.length+' offen':(S.todos.length?'Alles erledigt':'Deine persönliche Liste'))+'</p>';
+ h+='<div class="card" style="margin-bottom:12px"><form id="fTodo" style="flex-direction:row"><input id="todoIn" name="text" placeholder="Neue Aufgabe, z. B. Müllsäcke kaufen" aria-label="Neue Aufgabe" required><button class="btn" style="white-space:nowrap">Hinzufügen</button></form></div>';
+ if(!S.todos.length)return h+'<div class="card empty">Noch nichts auf der Liste.</div>';
+ function row(x){
+  var st=x.done?'background:var(--accent);color:var(--bg)':'';
+  return '<div class="card"><div class="row" style="cursor:default"><button class="done" style="'+st+'" aria-label="'+esc(x.text)+(x.done?' wieder öffnen':' erledigt')+'" data-tdone="'+x.id+'">✓</button><div class="grow"><div class="t" style="white-space:normal;'+(x.done?'text-decoration:line-through;color:var(--mute)':'')+'">'+esc(x.text)+'</div></div><button class="done" style="border-color:var(--line);color:var(--mute)" aria-label="Löschen" data-tdel="'+x.id+'">×</button></div></div>';
+ }
+ h+='<div class="list">'+open.map(row).join('')+'</div>';
+ if(dn.length)h+='<div class="hint">Erledigt</div><div class="list">'+dn.map(row).join('')+'</div><p><button class="btn ghost" data-tclear style="width:100%;margin-top:12px">Erledigte entfernen</button></p>';
+ return h;
+}
+function render(){
+ var h=S.tab==="home"?viewHome():S.tab==="today"?viewToday():S.tab==="stats"?viewStats():S.tab==="todo"?viewTodo():S.tab==="shop"?viewShop():(S.room?viewRoom():viewRooms());
+ document.getElementById("app").innerHTML=h;
+ document.querySelector("nav").style.display=["today","rooms","stats"].indexOf(S.tab)>-1?"":"none";
+ document.querySelectorAll("nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.tab===S.tab)});
+}
+document.addEventListener("click",function(e){
+ var el=e.target.closest("button");if(!el)return;
+ var d=el.dataset;
+ if(d.tab){S.tab=d.tab;S.room=null;S.add=null;render();window.scrollTo(0,0)}
+ else if(d.done){var p=d.done.split(",");markDone(+p[0],+p[1])}
+ else if(d.room){S.room=+d.room;S.add=null;render();window.scrollTo(0,0)}
+ else if(el.hasAttribute("data-back")){S.room=null;S.add=null;render()}
+ else if(el.hasAttribute("data-addroom")){S.add="room";render()}
+ else if(el.hasAttribute("data-addtask")){S.add="task";render()}
+ else if(el.hasAttribute("data-cancel")){S.add=null;render()}
+ else if(d.sdone){S.shop.forEach(function(x){if(x.id===+d.sdone)x.done=!x.done});save();render()}
+ else if(d.sdel){S.shop=S.shop.filter(function(x){return x.id!==+d.sdel});save();render()}
+ else if(el.hasAttribute("data-sclear")){S.shop=S.shop.filter(function(x){return !x.done});save();render()}
+ else if(d.q){addShop(d.q);save();render()}
+ else if(d.tdone){S.todos.forEach(function(x){if(x.id===+d.tdone)x.done=!x.done});save();render()}
+ else if(d.tdel){S.todos=S.todos.filter(function(x){return x.id!==+d.tdel});save();render()}
+ else if(el.hasAttribute("data-tclear")){S.todos=S.todos.filter(function(x){return !x.done});save();render()}
+ else if(d.pn){S.rooms.forEach(function(r){if(r.id===S.room)r.tasks.push(mk([d.pn,+d.pe],0))});save();render()}
+ else if(d.deltask){var q=d.deltask.split(",");S.rooms.forEach(function(r){if(r.id===+q[0])r.tasks=r.tasks.filter(function(t){return t.id!==+q[1]})});save();render()}
+ else if(d.delroom){
+  var r=S.rooms.filter(function(x){return x.id===+d.delroom})[0];
+  if(r&&el.dataset.sure!=="1"){el.dataset.sure="1";el.textContent="Wirklich löschen? Nochmal tippen";return}
+  S.rooms=S.rooms.filter(function(x){return x.id!==+d.delroom});S.room=null;save();render();
+ }
+});
+document.addEventListener("submit",function(e){
+ e.preventDefault();var f=e.target,v=new FormData(f);
+ if(f.id==="fShop"){addShop(String(v.get("text")));save();render();var si=document.getElementById("shopIn");if(si)si.focus();return}
+ if(f.id==="fTodo"){var tx=String(v.get("text")).trim();if(tx)S.todos.unshift({id:Date.now(),text:tx,done:false});save();render();var ti=document.getElementById("todoIn");if(ti)ti.focus();return}
+ if(f.id==="fRoom"){
+  var ty=String(v.get("type")||""),pr=PRE[ty];
+  var nm=String(v.get("name")).trim()||ty;
+  if(!nm){return}
+  S.rooms.push({id:Date.now(),type:ty,name:nm,icon:String(v.get("icon")).trim()||(pr?pr.icon:"🏠"),tasks:pr?pr.t.map(mk):[]});
+  S.add=null;
+ }else if(f.id==="fTask"){
+  S.rooms.forEach(function(r){if(r.id===S.room)r.tasks.push({id:Date.now(),name:String(v.get("name")).trim(),every:+v.get("every"),last:Date.now()})});
+  S.add=null;
+ }
+ save();render();
+});
+render();
+</script>
+</body>
+</html>
